@@ -9,7 +9,6 @@ import com.driver.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,23 +21,82 @@ public class ReservationServiceImpl implements ReservationService {
     ReservationRepository reservationRepository3;
     @Autowired
     ParkingLotRepository parkingLotRepository3;
+
     @Override
     public Reservation reserveSpot(Integer userId, Integer parkingLotId, Integer timeInHours, Integer numberOfWheels) throws Exception {
-        User user=userRepository3.findById(userId).orElseThrow(()->new Exception("User not found"));
-
-        ParkingLot parkingLot=parkingLotRepository3.findById(parkingLotId).orElseThrow(()->new Exception("Parking Lot not found"));
-
-        Spot spot = spotRepository3.findById(parkingLotId).orElseThrow(()->new Exception("No spot is available"));
-
-        if(spot.getNumberOfWheels()!=numberOfWheels){
-            throw new Exception("Spot is not available");
+        User user = userRepository3.findById(userId).get();
+        if (user == null) {
+            throw new Exception("Cannot make reservation");
+        }
+        ParkingLot parkingLot = parkingLotRepository3.findById(parkingLotId).get();
+        if (parkingLot == null) {
+            throw new Exception("Cannot make reservation");
+        }
+        List<Spot> spotList = parkingLot.getSpotList();
+        boolean twoWheeler = false;
+        boolean fourWheeler = false;
+        boolean Others = false;
+        if (numberOfWheels <= 2) {
+            twoWheeler = true;
+        }
+        if (numberOfWheels > 2 && numberOfWheels <= 4) {
+            fourWheeler = true;
+        }
+        if (numberOfWheels > 4) {
+            Others = true;
         }
 
-        LocalDateTime endTime=LocalDateTime.now().plusHours(timeInHours);
-        Reservation reservation=new Reservation(user,spot,LocalDateTime.now(),endTime);
-        reservationRepository3.save(reservation);
-        spot.setOccupied(true);
-        spotRepository3.save(spot);
+        boolean availability = false;
+        int Rent = Integer.MAX_VALUE;
+        Spot spot1 = new Spot();
+
+        for (Spot spot : spotList) {
+            if (twoWheeler) {
+                if (!spot.getOccupied() && spot.getSpotType() == SpotType.TWO_WHEELER || spot.getSpotType() == SpotType.FOUR_WHEELER || spot.getSpotType() == SpotType.OTHERS) {
+                    if (spot.getPricePerHour() < Rent) {
+                        spot1 = spot;
+                    }
+                    availability = true;
+                }
+            }
+            if (fourWheeler) {
+                if (!spot.getOccupied() && spot.getSpotType() == SpotType.FOUR_WHEELER || spot.getSpotType() == SpotType.OTHERS) {
+                    if (spot.getPricePerHour() < Rent) {
+                        spot1 = spot;
+                    }
+                    availability = true;
+                }
+            }
+            if (Others) {
+                if (!spot.getOccupied() && spot.getSpotType() == SpotType.OTHERS) {
+                    if (spot.getPricePerHour() < Rent) {
+                        spot1 = spot;
+                    }
+                    availability = true;
+                }
+            }
+        }
+        if (!availability) {
+            throw new Exception("Cannot make reservation");
+        }
+
+        Reservation reservation = new Reservation();//creating new Reservation
+        reservation.setSpot(spot1);
+        reservation.setNumberOfHours(timeInHours);
+        reservation.setUser(user);
+
+        spot1.setOccupied(true);
+
+        List<Reservation> reservationList = spot1.getReservationList();
+        reservationList.add(reservation);
+        spot1.setReservationList(reservationList);
+        spotRepository3.save(spot1);//saving reservation in parent spot;
+
+        List<Reservation> reservations = user.getReservationList();
+        reservations.add(reservation);
+        user.setReservationList(reservations);
+        userRepository3.save(user);//saving reservation in parent user;
+
 
         return reservation;
     }

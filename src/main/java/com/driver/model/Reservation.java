@@ -36,8 +36,7 @@ public class Reservation {
         Payment = payment;
     }
 
-    public Reservation(User user, Spot spot, LocalDateTime now, LocalDateTime endTime) {
-    }
+
 
     public int getId() {
         return id;
