@@ -1,37 +1,41 @@
 package com.driver.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table
 public class Spot {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Enumerated(value = EnumType.STRING)
+
+    @Enumerated(EnumType.STRING)
     private SpotType spotType;
-    @Column(nullable = false)
+
     private int pricePerHour;
-    @Column(nullable = false)
-    private Boolean isOccupied;
+
+    @Column(columnDefinition = "TINYINT(1)")
+    private Boolean occupied;
+
     @ManyToOne
     @JoinColumn
     private ParkingLot parkingLot;
-    @OneToMany(mappedBy = "spot",cascade = CascadeType.ALL)
-    private List<Reservation> reservationList;
-    private int numberOfWheels;
-    public Spot() {
-    }
 
-    public Spot(int id, SpotType spotType, int pricePerHour, Boolean isOccupied, ParkingLot parkingLot, List<Reservation> reservationList,int numberOfWheels) {
-        this.id = id;
+
+    @OneToMany(mappedBy = "spot",cascade = CascadeType.ALL)
+    private List<Reservation> reservationList=new ArrayList<>();
+
+
+    public Spot(SpotType spotType, int pricePerHour) {
         this.spotType = spotType;
         this.pricePerHour = pricePerHour;
-        this.isOccupied = isOccupied;
-        this.parkingLot = parkingLot;
-        this.reservationList = reservationList;
-        this.numberOfWheels=numberOfWheels;
+        this.occupied=false;
+    }
+
+    public Spot() {
+        this.occupied=false;
     }
 
     public int getId() {
@@ -59,11 +63,11 @@ public class Spot {
     }
 
     public Boolean getOccupied() {
-        return isOccupied;
+        return occupied;
     }
 
     public void setOccupied(Boolean occupied) {
-        isOccupied = occupied;
+        this.occupied = occupied;
     }
 
     public ParkingLot getParkingLot() {
@@ -81,12 +85,5 @@ public class Spot {
     public void setReservationList(List<Reservation> reservationList) {
         this.reservationList = reservationList;
     }
-
-    public int getNumberOfWheels() {
-        return numberOfWheels;
-    }
-
-    public void setNumberOfWheels(int numberOfWheels) {
-        this.numberOfWheels = numberOfWheels;
-    }
 }
+
