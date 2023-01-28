@@ -28,16 +28,6 @@ public class ParkingLotController {
     @PostMapping("/{parkingLotId}/spot/add")
     public ResponseEntity<Spot> addSpot(@PathVariable int parkingLotId, @RequestParam Integer numberOfWheels, @RequestParam Integer pricePerHour) {
         //create a new spot in the parkingLot with given id
-        SpotType spotType;
-        if(numberOfWheels==2){
-            spotType=SpotType.TWO_WHEELER;
-        }
-        else if(numberOfWheels==4){
-            spotType=SpotType.FOUR_WHEELER;
-        }
-        else{
-            spotType=SpotType.OTHERS;
-        }
         //the spot type should be the next biggest type in case the number of wheels are not 2 or 4, for 4+ wheels, it is others
         Spot newSpot=parkingLotService.addSpot(parkingLotId,numberOfWheels,pricePerHour);
         return new ResponseEntity<>(newSpot, HttpStatus.CREATED);
