@@ -1,42 +1,37 @@
 package com.driver.model;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name="Reservation")
 public class Reservation {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
     private int numberOfHours;
-    @Column(nullable = false)
+
+
     @ManyToOne
     @JoinColumn
     private User user;
-    @Column(nullable = false)
+
+
     @ManyToOne
     @JoinColumn
     private Spot spot;
-    @Column(nullable = false)
-    @OneToOne
-    @JoinColumn
-    private Payment Payment;
+
+
+    @OneToOne(mappedBy = "reservation",cascade = CascadeType.ALL)
+    private Payment payment;
+
+    public Reservation(int numberOfHours) {
+        this.numberOfHours = numberOfHours;
+    }
 
     public Reservation() {
     }
-
-    public Reservation(int id, int numberOfHours, User user, Spot spot, com.driver.model.Payment payment) {
-        this.id = id;
-        this.numberOfHours = numberOfHours;
-        this.user = user;
-        this.spot = spot;
-        Payment = payment;
-    }
-
-
 
     public int getId() {
         return id;
@@ -70,11 +65,11 @@ public class Reservation {
         this.spot = spot;
     }
 
-    public com.driver.model.Payment getPayment() {
-        return Payment;
+    public Payment getPayment() {
+        return payment;
     }
 
-    public void setPayment(com.driver.model.Payment payment) {
-        Payment = payment;
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 }
