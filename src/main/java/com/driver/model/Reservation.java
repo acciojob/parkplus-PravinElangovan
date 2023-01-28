@@ -1,6 +1,7 @@
 package com.driver.model;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="Reservation")
@@ -24,7 +25,7 @@ public class Reservation {
     @JoinColumn
     private Payment Payment;
 
-    public Reservation() {
+    public Reservation(User user, Spot spot, LocalDateTime now, LocalDateTime endTime) {
     }
 
     public Reservation(int id, int numberOfHours, User user, Spot spot, com.driver.model.Payment payment) {
