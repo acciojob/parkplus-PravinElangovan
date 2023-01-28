@@ -6,21 +6,25 @@ import javax.persistence.*;
 @Table
 public class Payment {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    private Boolean paymentCompleted;
+    private Boolean paymentCompleted = false;
     @Enumerated(value = EnumType.STRING)
     private PaymentMode paymentMode;
-    @OneToOne(mappedBy = "payment",cascade=CascadeType.ALL)
+
+    @OneToOne
+    @JoinColumn
     private Reservation reservation;
+
+    //Constructor,Getter& setter
+
 
     public Payment() {
     }
 
-    public Payment(int id, Boolean paymentCompleted, PaymentMode paymentMode, Reservation reservation) {
-        this.id = id;
+    public Payment(Boolean paymentCompleted, PaymentMode paymentMode) {
         this.paymentCompleted = paymentCompleted;
         this.paymentMode = paymentMode;
-        this.reservation = reservation;
     }
 
     public int getId() {
@@ -31,7 +35,7 @@ public class Payment {
         this.id = id;
     }
 
-    public Boolean getPaymentCompleted() {
+    public Boolean isPaymentCompleted() {
         return paymentCompleted;
     }
 
@@ -54,5 +58,4 @@ public class Payment {
     public void setReservation(Reservation reservation) {
         this.reservation = reservation;
     }
-
 }
