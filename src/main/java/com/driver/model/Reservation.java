@@ -25,7 +25,7 @@ public class Reservation {
     @JoinColumn
     private Payment Payment;
 
-    public Reservation(User user, Spot spot, LocalDateTime now, LocalDateTime endTime) {
+    public Reservation() {
     }
 
     public Reservation(int id, int numberOfHours, User user, Spot spot, com.driver.model.Payment payment) {
@@ -34,6 +34,9 @@ public class Reservation {
         this.user = user;
         this.spot = spot;
         Payment = payment;
+    }
+
+    public Reservation(User user, Spot spot, LocalDateTime now, LocalDateTime endTime) {
     }
 
     public int getId() {
